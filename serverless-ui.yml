@@ -5,6 +5,7 @@ provider:
   runtime: nodejs18.x
 plugins:
   - serverless-s3-sync
+  - serverless-scriptable-plugin
 custom:
   bucketName: react-monorepo-template-ui
   s3Sync:
@@ -76,3 +77,8 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
+
+scripts:
+  hooks:
+    deploy:finalize:
+      - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
