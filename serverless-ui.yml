@@ -11,6 +11,10 @@ custom:
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
+  scripts:
+    hooks:
+      'deploy:finalize':
+        - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
 
 resources:
   Resources:
@@ -77,8 +81,3 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
-
-scripts:
-  hooks:
-    deploy:finalize:
-      - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
