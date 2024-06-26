@@ -11,8 +11,10 @@ custom:
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
-  cloudFront:
-    distributionId: !Ref CloudFrontDistribution
+  cloudfrontInvalidate:
+    - distributionIdKey: !Ref CloudFrontDistribution
+      items: /*
+      stage: ${opt:stage}
   # scripts:
   #   hooks:
   #     'deploy:finalize':
