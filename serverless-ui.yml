@@ -12,7 +12,7 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionIdKey: CloudFrontDistributionId
+    - distributionIdKey: !Ref CloudFrontDistribution
       items: "/*"
   # scripts:
   #   hooks:
@@ -85,5 +85,3 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
-    Outputs:
-      CloudFrontDistributionId: !Ref CloudFrontDistribution  
