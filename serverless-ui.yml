@@ -86,7 +86,4 @@ resources:
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
     Outputs:
-      CloudFrontDistributionId:
-        Description: CDN distribution id.
-        Value:
-          Ref: CloudFrontDistribution  
+      CloudFrontDistributionId: !Ref CloudFrontDistribution
