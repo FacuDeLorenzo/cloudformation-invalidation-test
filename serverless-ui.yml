@@ -83,7 +83,9 @@ resources:
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
   Outputs:
-    CloudFormationId:
+    CloudFrontDistribution:
       Description: CloudFormation Distribution Id
       Value: !GetAtt CloudFrontDistribution.Id
       Type: String
+      Export:
+        Name: CloudFormationId
