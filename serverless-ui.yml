@@ -12,7 +12,7 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionId: CloudFrontDistribution
+    - distributionId: !Ref CloudFormationId
       items: 
         - "/*"
 
@@ -82,3 +82,7 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
+    Outputs:
+      CloudFormationId:
+        Description: CloudFormation Distribution Id
+        Value: !GetAtt CloudFrontDistribution.Id
