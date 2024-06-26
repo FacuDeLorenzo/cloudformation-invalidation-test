@@ -12,12 +12,9 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionIdKey: !Ref CloudFrontDistribution
-      items: "/*"
-  # scripts:
-  #   hooks:
-  #     'deploy:finalize':
-  #       - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
+    - distributionId: !Ref CloudFrontDistribution.Id
+      items: 
+        - "/*"
 
 resources:
   Resources:
