@@ -12,7 +12,7 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionIdKey: CloudFrontDistributionId
+    - distributionIdKey: !Ref CloudFrontDistributionId
       items: /*
   # scripts:
   #   hooks:
