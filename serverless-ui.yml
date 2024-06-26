@@ -86,3 +86,4 @@ resources:
       CloudFormationId:
         Description: CloudFormation Distribution Id
         Value: !GetAtt CloudFrontDistribution.Id
+        Type: String
