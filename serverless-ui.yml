@@ -81,3 +81,4 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
+      DependsOn: ReactAppBucket
