@@ -1,4 +1,4 @@
-service: react-monorepo-template-ui
+service: cfmtninvalidation-test-ui
 provider:
   name: aws
   region: sa-east-1
@@ -7,7 +7,7 @@ plugins:
   - serverless-s3-sync
   - serverless-scriptable-plugin
 custom:
-  bucketName: react-monorepo-template-ui
+  bucketName: cfmtninvalidation-test-ui
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
