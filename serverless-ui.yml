@@ -82,8 +82,8 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
-    Outputs:
-      CloudFormationId:
-        Description: CloudFormation Distribution Id
-        Value: !GetAtt CloudFrontDistribution.Id
-        Type: String
+  Outputs:
+    CloudFormationId:
+      Description: CloudFormation Distribution Id
+      Value: !GetAtt CloudFrontDistribution.Id
+      Type: String
