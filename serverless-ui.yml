@@ -5,16 +5,18 @@ provider:
   runtime: nodejs18.x
 plugins:
   - serverless-s3-sync
-  - serverless-scriptable-plugin
+  - serverless-cloudfront-invalidate
 custom:
   bucketName: cfmtninvalidation-test-ui
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
-  scripts:
-    hooks:
-      'deploy:finalize':
-        - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
+  cloudFront:
+    distributionId: !Ref CloudFrontDistribution
+  # scripts:
+  #   hooks:
+  #     'deploy:finalize':
+  #       - aws cloudfront create-invalidation --distribution-id !Ref MyCloudFrontDistribution --paths '/*'
 
 resources:
   Resources:
