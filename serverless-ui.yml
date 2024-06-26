@@ -1,11 +1,14 @@
 service: cfmtninvalidation-test-ui
+
 provider:
   name: aws
   region: sa-east-1
   runtime: nodejs18.x
+
 plugins:
   - serverless-s3-sync
   - serverless-cloudfront-invalidate
+
 custom:
   bucketName: cfmtninvalidation-test-ui
   s3Sync:
@@ -22,18 +25,15 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.bucketName}
-        ### No more AccessControl
-        # AccessControl: PublicRead
-        ###  replace it with...
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
         OwnershipControls:
           Rules:
             - ObjectOwnership: ObjectWriter
-        ###
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
+
     S3AccessPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -47,6 +47,7 @@ resources:
               Action:
                 - s3:GetObject
               Resource: arn:aws:s3:::${self:custom.bucketName}/*
+
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution
       DependsOn: ReactAppBucket
@@ -82,10 +83,11 @@ resources:
             ViewerProtocolPolicy: redirect-to-https
           ViewerCertificate:
             CloudFrontDefaultCertificate: true
-    Outputs:
-      CloudFrontDistributionId:
-        Description: CloudFormation Distribution Id
-        Value: 
-          Fn::GetAtt:
-            - CloudFrontDistribution
-            - Id
+
+  Outputs:
+    CloudFrontDistributionId:
+      Description: "CloudFront Distribution Id"
+      Value:
+        Fn::GetAtt:
+          - CloudFrontDistribution
+          - Id
