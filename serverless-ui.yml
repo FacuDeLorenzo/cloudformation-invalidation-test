@@ -15,8 +15,8 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionId: !Ref CloudFrontDistributionId
-      items: 
+    - distributionId: ${cf:${self:service}-${self:provider.stage}.CloudFrontDistributionId}
+      items:
         - "/*"
 
 resources:
@@ -54,13 +54,13 @@ resources:
       Properties:
         DistributionConfig:
           Origins:
-            - DomainName: ${self:custom.bucketName}.s3.sa-east-1.amazonaws.com
+            - DomainName: ${self:custom.bucketName}.s3.${self:provider.region}.amazonaws.com
               Id: ReactApp
               CustomOriginConfig:
                 HTTPPort: 80
                 HTTPSPort: 443
                 OriginProtocolPolicy: https-only
-          Enabled: "true"
+          Enabled: true
           DefaultRootObject: index.html
           CustomErrorResponses:
             - ErrorCode: 404
@@ -77,7 +77,7 @@ resources:
               - PUT
             TargetOriginId: ReactApp
             ForwardedValues:
-              QueryString: "false"
+              QueryString: false
               Cookies:
                 Forward: none
             ViewerProtocolPolicy: redirect-to-https
