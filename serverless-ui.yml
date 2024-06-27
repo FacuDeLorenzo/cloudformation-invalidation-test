@@ -15,7 +15,7 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionIdKey: !Ref CloudFrontDistributionId
+    - distributionIdKey:  "CloudFrontDistributionId"
       items:
         - "/*"
 
@@ -88,7 +88,4 @@ resources:
     CloudFrontDistributionId:
       Description: "CloudFront Distribution Id"
       Value:
-        Ref: 
-          Fn::GetAtt:
-            - CloudFrontDistribution
-            - Id
+        Ref: CloudFrontDistribution
