@@ -88,6 +88,4 @@ resources:
     CloudFrontDistributionId:
       Description: "CloudFront Distribution Id"
       Value:
-        Fn::GetAtt:
-          - CloudFrontDistribution
-          - Id
+        Ref: CloudFrontDistribution
