@@ -15,7 +15,7 @@ custom:
     - bucketName: ${self:custom.bucketName}
       localDir: packages/ui/dist
   cloudfrontInvalidate:
-    - distributionId: ${cf:${self:service}-${self:provider.stage}.CloudFrontDistributionId}
+    - distributionIdKey: !Ref CloudFrontDistributionId
       items:
         - "/*"
 
