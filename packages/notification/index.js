@@ -1,8 +1,8 @@
 exports.handler = async (event ) => {
   console.log("event: ", event);
   for (const record of event.Records) {
-    console.log('Mensaje de SQS recibido:', snsMessage);
-    const snsMessage = record.Sqs.Message;    
+    const snsMessage = JSON.parse(record.body);
+    console.log('Mensaje de SNS recibido:', snsMessage.Message); 
   }
     return {
       statusCode: 200,

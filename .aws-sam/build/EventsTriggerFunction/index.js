@@ -5,8 +5,8 @@ exports.handler = async (event ) => {
     console.log('Mensaje de SNS recibido:', snsMessage.Message);
   }
     return {
-      statusCode: 200,
-      body: JSON.stringify('Hello from Lambda!'),
+      statusCode: 500,
+      body: JSON.stringify('probando DLQ!'),
     };
   };
   
