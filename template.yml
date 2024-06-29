@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Blockchain Event Sourcing ecosystem template
+
+# Parameters:
+#   Region:
+#     Type: String
+#     Default: sa-east-1
+
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  #Dynamo tables
+  BlockchainEventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Address
+          AttributeType: S
+        - AttributeName: EventName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Address
+          KeyType: HASH
+        - AttributeName: EventName
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  # LastReadBlockTable:
+  # # #Requiere un id la tabla para buscar por dicho indice.
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     AttributeDefinitions:
+  #       - AttributeName: Address
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: Address
+  #         KeyType: HASH
+  #     BillingMode: PAY_PER_REQUEST
+
+  #SNS topics & SQS queues
+  BlockchainEventsSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: blockchain-events
+      Subscription:
+        - Endpoint: !GetAtt DBWriterFunction.Arn
+          Protocol: lambda
+        - Endpoint: !GetAtt EventsTriggerSQSQueue.Arn
+          Protocol: sqs
+
+  EventsTriggerSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: events-trigger
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EventsTriggerDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  EventsTriggerDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: dead-events-trigger
+
+  EventsTriggerSQSQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref EventsTriggerSQSQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: SQS:SendMessage
+            Resource: !GetAtt EventsTriggerSQSQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref BlockchainEventsSNSTopic
+
+  #Functions
+  SNSPublishFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./packages/sns-publish
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref BlockchainEventsSNSTopic
+          # AWS_REGION: !Ref Region
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource:
+                - !Ref BlockchainEventsSNSTopic
+
+  DBWriterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./packages/db-writer
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BlockchainEventsTable
+      Events:
+        TriggerEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref BlockchainEventsSNSTopic
+      Environment:
+        Variables:
+          EVENTS_TABLE_NAME: !Ref BlockchainEventsTable
+
+  EventsTriggerFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: EventsTriggerSQSQueue
+    Properties:
+      CodeUri: ./packages/trigger
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref BlockchainEventsTable
+      Events:
+        TriggerEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EventsTriggerSQSQueue.Arn
+
+  NotificationFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: EventsTriggerDeadLetterQueue
+    Properties:
+      CodeUri: ./packages/notification
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Events:
+        TriggerEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EventsTriggerDeadLetterQueue.Arn
